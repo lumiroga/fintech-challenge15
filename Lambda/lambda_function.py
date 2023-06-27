@@ -126,33 +126,35 @@ def recommend_portfolio(intent_request):
 
     validation_result = validate_fields(age,investment_amount)
     
+    #print(risk_level)
     if validation_result[0]:
-        return build_validation_result(True,None,)
+        return build_validation_result(True,None,get_recommendation(risk_level))
+    else:
+        return validation_result[1]
 
 def get_recommendation(risk_level):
     if risk_level=='Low':
-        "40% bonds (AGG), 60% equities (SPY)"
+        return "40% bonds (AGG), 60% equities (SPY)"
     elif risk_level =="High":
-        "40% bonds (AGG), 60% equities (SPY)"
+        return "40% bonds (AGG), 60% equities (SPY)"
     elif risk_level =="Medium":
-        "40% bonds (AGG), 60% equities (SPY)"
+        return "40% bonds (AGG), 60% equities (SPY)"
     elif risk_level == "None":
         return "100% bonds (AGG), 0% equities (SPY)"
 
 
 def validate_fields(age,investment_amount):
     
-    if age >= 1 and age < 65:
-        return (True,None)
-    else:
+    age = parse_int(age)
+    investment_amount = parse_int(investment_amount)
+    
+    if age < 1 or age > 65:
         return (False,build_validation_result(False, 'age','Age must be less than 65 and 1 year or more'))
-    if investment_amount >= 5000:
-        return (True,None)
-    else:
+        
+    if investment_amount < 5000:
         return (False,build_validation_result(False, 'investment_amount','You should at least invest $5,000'))
     
-    
-    
+    return (True,None)
 
 ### Intents Dispatcher ###
 def dispatch(intent_request):
