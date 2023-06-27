@@ -117,6 +117,7 @@ def recommend_portfolio(intent_request):
     """
     Performs dialog management and fulfillment for recommending a portfolio.
     """
+    slots = get_slots(intent_request)
 
     first_name = get_slots(intent_request)["firstName"]
     age = get_slots(intent_request)["age"]
@@ -124,13 +125,53 @@ def recommend_portfolio(intent_request):
     risk_level = get_slots(intent_request)["riskLevel"]
     source = intent_request["invocationSource"]
 
-    validation_result = validate_fields(age,investment_amount)
-    
-    #print(risk_level)
-    if validation_result[0]:
-        return build_validation_result(True,None,get_recommendation(risk_level))
-    else:
-        return validation_result[1]
+    if source == 'DialogCodeHook':
+
+        validation_result = validate_fields(age,investment_amount,intent_request)
+
+        if not validate_fields["isValid"]:
+            slots[validation_result["violatedSlot"]] = None  # Cleans invalid slot
+
+            # Returns an elicitSlot dialog to request new data for the invalid slot
+            return elicit_slot(
+                intent_request["sessionAttributes"],
+                intent_request["currentIntent"]["name"],
+                slots,
+                validation_result["violatedSlot"],
+                validation_result["message"],
+            )
+
+    output_session_attributes = intent_request["sessionAttributes"]
+
+    return delegate(output_session_attributes, get_slots(intent_request)) 
+
+def validate_fields(age, investment_amount, intent_request):
+    """
+    Validates the data provided by the user.
+    """
+
+    # Validate that the user is over 21 years old
+    if age is not None:
+        age = parse_int(age)
+        if age < 65 or age < 1:
+            return build_validation_result(
+                False,
+                "age",
+                "You need to be less than 65 years old and more than 0 years old",
+            )
+
+    # Validate the investment amount, it should be > 0
+    if investment_amount is not None:
+        investment_amount = parse_int(investment_amount)
+        if investment_amount < 5000:
+            return build_validation_result(
+                False,
+                "investment_amount",
+                "You should invest $5000 at least",
+            )
+
+    # A True results is returned if age or amount are valid
+    return build_validation_result(True, None, None)
 
 def get_recommendation(risk_level):
     if risk_level=='Low':
@@ -142,19 +183,6 @@ def get_recommendation(risk_level):
     elif risk_level == "None":
         return "100% bonds (AGG), 0% equities (SPY)"
 
-
-def validate_fields(age,investment_amount):
-    
-    age = parse_int(age)
-    investment_amount = parse_int(investment_amount)
-    
-    if age < 1 or age > 65:
-        return (False,build_validation_result(False, 'age','Age must be less than 65 and 1 year or more'))
-        
-    if investment_amount < 5000:
-        return (False,build_validation_result(False, 'investment_amount','You should at least invest $5,000'))
-    
-    return (True,None)
 
 ### Intents Dispatcher ###
 def dispatch(intent_request):
