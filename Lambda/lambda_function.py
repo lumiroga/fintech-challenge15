@@ -141,9 +141,16 @@ def recommend_portfolio(intent_request):
                 validation_result["message"],
             )
 
-    output_session_attributes = intent_request["sessionAttributes"]
+        output_session_attributes = intent_request["sessionAttributes"]
 
-    return delegate(output_session_attributes, get_slots(intent_request)) 
+        return delegate(output_session_attributes, get_slots(intent_request))
+    
+    return close(
+    intent_request["sessionAttributes"],
+    "Fulfilled",
+    {"contentType": "PlainText",
+    "content": get_recommendation(risk_level)
+    })
 
 def validate_fields(age, investment_amount, intent_request):
     """
