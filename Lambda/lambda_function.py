@@ -129,7 +129,7 @@ def recommend_portfolio(intent_request):
 
         validation_result = validate_fields(age,investment_amount,intent_request)
 
-        if not validate_fields["isValid"]:
+        if not validation_result["isValid"]:
             slots[validation_result["violatedSlot"]] = None  # Cleans invalid slot
 
             # Returns an elicitSlot dialog to request new data for the invalid slot
@@ -153,7 +153,7 @@ def validate_fields(age, investment_amount, intent_request):
     # Validate that the user is over 21 years old
     if age is not None:
         age = parse_int(age)
-        if age < 65 or age < 1:
+        if age > 65 or age < 1:
             return build_validation_result(
                 False,
                 "age",
