@@ -17,19 +17,13 @@ The following components were used:
 
 First step is to configure the Chatbot via configuration in AWS Lex, the result is the following:
 
- <video width="320" height="240" controls>
-  <source src="fintech-challenge15-Step1.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video> 
+[Step 1 and 2](./fintech-challenge15-Step1.mp4)
 
 ## Results - Step 3
 
 Thrid step was to configure the Chatbot, create a lambda serverless application and communicate it with Lex to get a response
-<video width="320" height="240" controls>
-  <source src="fintech-challenge15-Step3.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video> 
 
+[Step 3](./fintech-challenge15-Step3.mp4)
 
 ---
 
